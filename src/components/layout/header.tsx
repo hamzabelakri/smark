@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Hexagon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { LanguageSwitch } from '../language-switch'
 import { ProfileDropdown } from '../profile-dropdown'
-import { Search } from '../search'
 import { ThemeSwitch } from '../theme-switch'
 import { HeaderNav } from './header-nav'
 
@@ -19,9 +17,8 @@ export function Header({ className, fixed, ...props }: HeaderProps) {
   const [offset, setOffset] = useState(0)
 
   useEffect(() => {
-    const onScroll = () => {
+    const onScroll = () =>
       setOffset(document.body.scrollTop || document.documentElement.scrollTop)
-    }
     document.addEventListener('scroll', onScroll, { passive: true })
     return () => document.removeEventListener('scroll', onScroll)
   }, [])
@@ -29,41 +26,34 @@ export function Header({ className, fixed, ...props }: HeaderProps) {
   return (
     <header
       className={cn(
-        'z-50 h-16',
+        'bg-background text-foreground z-50 h-17 border-b',
         fixed && 'header-fixed peer/header sticky top-0 w-[inherit]',
-        offset > 10 && fixed
-          ? 'shadow after:absolute after:inset-0 after:-z-10 after:bg-black/20 after:backdrop-blur-lg'
-          : 'shadow-none',
+        offset > 10 && fixed ? 'shadow-md' : 'shadow-none',
         className
       )}
       {...props}
     >
-      <div
-        className={cn(
-          'flex h-full items-center justify-between gap-3 p-4 text-foreground md:grid md:grid-cols-[1fr_auto_1fr] md:gap-4 mx-auto w-full max-w-7xl',
-          
-        )}
-      >
+      <div className='flex h-full items-center gap-4 mx-auto w-full max-w-7xl'>
         {/* Left: mobile trigger + logo */}
         <div className='flex items-center gap-3'>
           <SidebarTrigger variant='outline' className='scale-125 md:hidden' />
-          <Separator orientation='vertical' className='h-6 md:hidden' />
-           <img
-                src="/images/astero.ico"
-                alt="Asteroidea"
-                width={40}
-                height={10}
-                className="rounded-lg object-contain"
-              />
-            <span className='hidden sm:inline'>Asteroidea</span>
+          <Link to='/' className='flex items-center gap-2.5'>
+            <img
+              src='/images/astero.ico'
+              alt=''
+              className='size-9 rounded-full object-contain'
+            />
+            <span className='hidden text-xl font-semibold tracking-tight sm:inline'>
+              Asteroidea
+            </span>
+          </Link>
         </div>
 
-        {/* Center: navigation (desktop only) */}
+        {/* Nav sits right after the logo */}
         <HeaderNav />
 
-        {/* Right: actions */}
-        <div className='flex items-center justify-end gap-2 sm:gap-4'>
-         
+        {/* Right: actions pushed to the end */}
+        <div className='ml-auto flex items-center gap-1 sm:gap-2'>
           <LanguageSwitch />
           <ThemeSwitch />
           <ProfileDropdown />
