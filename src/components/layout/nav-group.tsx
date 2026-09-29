@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next' // Or your specific i18n library hook
 
 import {
   Collapsible,
@@ -34,6 +34,7 @@ import {
   type NavLink,
   type NavGroup as NavGroupProps,
 } from '@/models/sidebar-model'
+import { checkIsActive } from '@/lib/utils'
 
 export function NavGroup({ title, items }: NavGroupProps) {
   const { state, isMobile } = useSidebar()
@@ -195,13 +196,3 @@ function SidebarMenuCollapsedDropdown({
   )
 }
 
-function checkIsActive(href: string, item: NavItem, mainNav = false) {
-  return (
-    href === item.url ||
-    href.split('?')[0] === item.url ||
-    !!item?.items?.filter((i) => i.url === href).length ||
-    (mainNav &&
-      href.split('/')[1] !== '' &&
-      href.split('/')[1] === item?.url?.split('/')[1])
-  )
-}

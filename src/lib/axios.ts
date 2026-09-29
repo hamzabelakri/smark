@@ -8,7 +8,7 @@ import i18n from "./language/i18n/i18n";
 const getApiUrl = (): string => {
   // Server-side fallback (SSR / Node, if needed)
   if (typeof window === "undefined") {
-    return import.meta.env.VITE_API_URL;
+    return import.meta.env.VITE_API_URL || "http://localhost:8800/api";
   }
 
   // Client-side logic

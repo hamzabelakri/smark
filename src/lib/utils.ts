@@ -1,3 +1,4 @@
+import { NavItem } from '@/models/sidebar-model';
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 export function cn(...inputs: ClassValue[]) {
@@ -21,3 +22,13 @@ export const createDownloadLink = (blob: Blob, filename: string) => {
 
 
 
+export function checkIsActive(href: string, item: NavItem, mainNav = false) {
+  return (
+    href === item.url ||
+    href.split('?')[0] === item.url ||
+    !!item?.items?.filter((i) => i.url === href).length ||
+    (mainNav &&
+      href.split('/')[1] !== '' &&
+      href.split('/')[1] === item?.url?.split('/')[1])
+  )
+}

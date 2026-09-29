@@ -1,30 +1,28 @@
 import { useEffect, useState } from 'react'
+import { Link } from '@tanstack/react-router'
+import { Hexagon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { ConfigDrawer } from '../config-drawer'
 import { LanguageSwitch } from '../language-switch'
 import { ProfileDropdown } from '../profile-dropdown'
 import { Search } from '../search'
 import { ThemeSwitch } from '../theme-switch'
+import { HeaderNav } from './header-nav'
 
-type HeaderProps = React.HTMLAttributes<HTMLElement> & {
+type HeaderProps = Omit<React.HTMLAttributes<HTMLElement>, 'children'> & {
   fixed?: boolean
   ref?: React.Ref<HTMLElement>
 }
 
-export function Header({ className, fixed, children, ...props }: HeaderProps) {
+export function Header({ className, fixed, ...props }: HeaderProps) {
   const [offset, setOffset] = useState(0)
 
   useEffect(() => {
     const onScroll = () => {
       setOffset(document.body.scrollTop || document.documentElement.scrollTop)
     }
-
-    // Add scroll listener to the body
     document.addEventListener('scroll', onScroll, { passive: true })
-
-    // Clean up the event listener on unmount
     return () => document.removeEventListener('scroll', onScroll)
   }, [])
 
@@ -33,35 +31,43 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
       className={cn(
         'z-50 h-16',
         fixed && 'header-fixed peer/header sticky top-0 w-[inherit]',
-        offset > 10 && fixed ? 'shadow' : 'shadow-none',
+        offset > 10 && fixed
+          ? 'shadow after:absolute after:inset-0 after:-z-10 after:bg-black/20 after:backdrop-blur-lg'
+          : 'shadow-none',
         className
       )}
       {...props}
     >
       <div
         className={cn(
-          'relative flex h-full items-center gap-3 p-4 sm:gap-4',
-          offset > 10 &&
-            fixed &&
-            'after:bg-background/20 after:absolute after:inset-0 after:-z-10 after:backdrop-blur-lg'
+          'flex h-full items-center justify-between gap-3 p-4 text-foreground md:grid md:grid-cols-[1fr_auto_1fr] md:gap-4 mx-auto w-full max-w-7xl',
+          
         )}
       >
-        <img
-          src='/images/astero.ico'
-          alt='Asteroidea'
-          width={32}
-          height={32}
-          className='rounded-lg object-contain'
-        />
-
-        <div className='ms-auto flex items-center space-x-4'>
-          <LanguageSwitch />
-          <ThemeSwitch />
-          <ConfigDrawer />
-          <ProfileDropdown />
+        {/* Left: mobile trigger + logo */}
+        <div className='flex items-center gap-3'>
+          <SidebarTrigger variant='outline' className='scale-125 md:hidden' />
+          <Separator orientation='vertical' className='h-6 md:hidden' />
+           <img
+                src="/images/astero.ico"
+                alt="Asteroidea"
+                width={40}
+                height={10}
+                className="rounded-lg object-contain"
+              />
+            <span className='hidden sm:inline'>Asteroidea</span>
         </div>
 
-        {children}
+        {/* Center: navigation (desktop only) */}
+        <HeaderNav />
+
+        {/* Right: actions */}
+        <div className='flex items-center justify-end gap-2 sm:gap-4'>
+         
+          <LanguageSwitch />
+          <ThemeSwitch />
+          <ProfileDropdown />
+        </div>
       </div>
     </header>
   )

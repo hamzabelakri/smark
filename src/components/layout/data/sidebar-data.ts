@@ -19,7 +19,7 @@ export const sidebarData: SidebarData = {
   },
   teams: [
     {
-      name: 'University', 
+      name: 'Asteroidea', 
       logo: Command,
     },
     {

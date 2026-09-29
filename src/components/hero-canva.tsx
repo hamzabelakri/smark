@@ -18,7 +18,7 @@ export function HeroCanvas({
   return (
     <div
       className={cn(
-        'after:bg-hero-canvas/70 fixed inset-x-0 top-0 z-1 block bg-[url(/images/background.jpg)] bg-cover bg-center bg-no-repeat after:block after:size-full',
+        'after:bg-hero-canvas fixed inset-x-0 top-0 z-1 block bg-[url(/images/background.jpg)] bg-cover bg-center bg-no-repeat after:block after:size-full',
         height,
         className
       )}

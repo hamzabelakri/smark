@@ -4,16 +4,13 @@ import { CircleCheck, RotateCcw, Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { IconDir } from "@/assets/custom/icon-dir";
-import { IconLayoutCompact } from "@/assets/custom/icon-layout-compact";
-import { IconLayoutDefault } from "@/assets/custom/icon-layout-default";
-import { IconLayoutFull } from "@/assets/custom/icon-layout-full";
 import { IconThemeDark } from "@/assets/custom/icon-theme-dark";
 import { IconThemeLight } from "@/assets/custom/icon-theme-light";
 import { IconThemeSystem } from "@/assets/custom/icon-theme-system";
 
 import { cn } from "@/lib/utils";
 import { useDirection } from "@/context/direction-provider";
-import { type Collapsible, useLayout } from "@/context/layout-provider";
+import { useLayout } from "@/context/layout-provider";
 import { useTheme } from "@/context/theme-provider";
 
 import { Button } from "@/components/ui/button";
@@ -27,18 +24,14 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { useSidebar } from "./ui/sidebar";
-
 export function ConfigDrawer() {
   const { t } = useTranslation();
 
-  const { setOpen } = useSidebar();
   const { resetDir } = useDirection();
   const { resetTheme } = useTheme();
   const { resetLayout } = useLayout();
 
   const handleReset = () => {
-    setOpen(true);
     resetDir();
     resetTheme();
     resetLayout();
@@ -69,7 +62,6 @@ export function ConfigDrawer() {
 
         <div className="space-y-6 overflow-y-auto px-4">
           <ThemeConfig />
-          <LayoutConfig />
           <DirConfig />
         </div>
 
@@ -226,68 +218,6 @@ function ThemeConfig() {
 
       <div id="theme-description" className="sr-only">
         {t("theme_description")}
-      </div>
-    </div>
-  );
-}
-
-function LayoutConfig() {
-  const { t } = useTranslation();
-
-  const { open, setOpen } = useSidebar();
-  const { defaultCollapsible, collapsible, setCollapsible } = useLayout();
-
-  const radioState = open ? "default" : collapsible;
-
-  return (
-    <div className="max-md:hidden">
-      <SectionTitle
-        title={t("layout")}
-        showReset={radioState !== "default"}
-        onReset={() => {
-          setOpen(true);
-          setCollapsible(defaultCollapsible);
-        }}
-      />
-
-      <Radio
-        value={radioState}
-        onValueChange={(v) => {
-          if (v === "default") {
-            setOpen(true);
-            return;
-          }
-
-          setOpen(false);
-          setCollapsible(v as Collapsible);
-        }}
-        className="grid w-full max-w-md grid-cols-3 gap-4"
-        aria-label={t("select_layout_style")}
-        aria-describedby="layout-description"
-      >
-        {[
-          {
-            value: "default",
-            label: t("default"),
-            icon: IconLayoutDefault,
-          },
-          {
-            value: "icon",
-            label: t("compact"),
-            icon: IconLayoutCompact,
-          },
-          {
-            value: "offcanvas",
-            label: t("full_layout"),
-            icon: IconLayoutFull,
-          },
-        ].map((item) => (
-          <RadioGroupItem key={item.value} item={item} />
-        ))}
-      </Radio>
-
-      <div id="layout-description" className="sr-only">
-        {t("layout_description")}
       </div>
     </div>
   );
