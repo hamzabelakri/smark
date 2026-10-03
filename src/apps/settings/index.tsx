@@ -46,9 +46,7 @@ export function Settings() {
     <>
       <Main fixed>
         <div className="mb-2 flex flex-wrap items-center space-x-2">
-          <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-            <IconSettings className="size-5" />
-          </div>
+
           <h2 className="text-2xl font-bold tracking-tight">{t("settings")}</h2>
         </div>
         <Separator className='my-4 lg:my-6' />

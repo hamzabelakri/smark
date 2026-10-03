@@ -37,8 +37,8 @@ export function TeamSwitcher({ teams }: TeamSwitcherProps) {
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
             >
              <img
-                src="/images/astero.ico"
-                alt="Asteroidea"
+                src="/images/Smark_logo.svg"
+                alt="Smark"
                 width={40}
                 height={10}
                 className="rounded-lg object-contain"

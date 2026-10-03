@@ -1,11 +1,14 @@
+import { useMemo } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
+import { IconEdit } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -23,8 +26,7 @@ import { PasswordInput } from "@/components/password-input";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { useChangePassword } from "@/hooks/use-users";
 
-import { IconEdit } from "@tabler/icons-react";
-import { useMemo } from "react";
+// ── Schema Factory ───────────────────────────────────────────────
 
 const getSchema = (t: any) =>
   z.object({
@@ -39,11 +41,16 @@ const getSchema = (t: any) =>
   });
 
 type ChangePasswordForm = z.infer<ReturnType<typeof getSchema>>;
+
+// ── Props ────────────────────────────────────────────────────────
+
 interface Props {
   user: any;
   open: boolean;
   onClose: () => void;
 }
+
+// ── Component ────────────────────────────────────────────────────
 
 export function ChangePasswordModal({ open, onClose, user }: Props) {
   const { t } = useTranslation();
@@ -62,7 +69,7 @@ export function ChangePasswordModal({ open, onClose, user }: Props) {
   };
 
   const onSubmit = (values: ChangePasswordForm) => {
-    if (!user.user_id) return;
+    if (!user?.user_id) return;
 
     changePassword(
       { id: user.user_id, payload: values },
@@ -71,60 +78,80 @@ export function ChangePasswordModal({ open, onClose, user }: Props) {
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(nextOpen) => {
-        if (!nextOpen) handleClose();
-      }}
-    >
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader className="border-b pb-3">
-          <DialogTitle className="flex items-center gap-2">
-            <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-              <IconEdit className="size-5" />
+    <Dialog open={open} onOpenChange={(state) => { if (!state) handleClose() }}>
+      <DialogContent className="">
+        
+        {/* ── Header ── */}
+        <DialogHeader className="pt-5 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <IconEdit className="size-5 text-primary" />
             </div>
-            {t("change_password")}
-          </DialogTitle>
+            <div>
+              <DialogTitle>{t("change_password")}</DialogTitle>
+            </div>
+          </div>
         </DialogHeader>
 
-        <Form {...form}>
-          <form
-            id="change-password-form"
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4"
-          >
-            <FormField
-              control={form.control}
-              name="old_password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("old_password")}</FormLabel>
-                  <FormControl>
-                    <PasswordInput autoComplete="current-password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {/* ── Body ── */}
+        <DialogBody>
+          <Form {...form}>
+            <form
+              id="change-password-form"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={form.control}
+                name="old_password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs text-muted-foreground">
+                      {t("old_password")}
+                    </FormLabel>
+                    <FormControl>
+                      <PasswordInput 
+                        placeholder="••••••••"
+                        autoComplete="current-password" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="new_password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel> {t("new_password")}</FormLabel>
-                  <FormControl>
-                    <PasswordInput autoComplete="new-password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
+              <FormField
+                control={form.control}
+                name="new_password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs text-muted-foreground">
+                      {t("new_password")}
+                    </FormLabel>
+                    <FormControl>
+                      <PasswordInput 
+                        placeholder="••••••••"
+                        autoComplete="new-password" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </DialogBody>
 
+        {/* ── Footer ── */}
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={handleClose}>
+          <Button 
+            variant="ghost" 
+            type="button" 
+            onClick={handleClose}
+            className="text-muted-foreground"
+          >
             {t("cancel")}
           </Button>
 
@@ -132,10 +159,11 @@ export function ChangePasswordModal({ open, onClose, user }: Props) {
             type="submit"
             form="change-password-form"
             disabled={isPending}
+            className="min-w-24"
           >
             {isPending ? (
               <>
-                <Spinner variant="circle" />
+                <Spinner variant="circle" className="mr-2" />
                 {t("submitting")}
               </>
             ) : (

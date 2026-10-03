@@ -20,6 +20,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { OctagonAlert, TrashIcon } from "lucide-react";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   open: boolean;
@@ -38,6 +39,7 @@ export function DeleteRoleAlert({
   onConfirm,
   isLoading,
 }: Props) {
+  const { t } = useTranslation();
   const [selectedRoleId, setSelectedRoleId] = useState<string>("");
 
   const reassignableRoles = availableRoles.filter(
@@ -60,6 +62,12 @@ export function DeleteRoleAlert({
     onClose();
   };
 
+  // Helper function to replace {{count}} dynamically in translations
+  const formatDescription = (count: number) => {
+    const template = t('role_has_users_message');
+    return template.replace('{{count}}', String(count));
+  };
+
   return (
     <AlertDialog open={open}>
       <AlertDialogContent>
@@ -68,19 +76,18 @@ export function DeleteRoleAlert({
             <div className="mb-2 mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
               <OctagonAlert className="h-7 w-7 text-destructive animate-pulse" />
             </div>
-            Are you sure you want to delete this role?
+            {t('delete_role_confirmation')}
           </AlertDialogTitle>
           
-          {hasUsers &&(
+          {hasUsers && (
             <>
               <AlertDialogDescription className="text-center">
-                This role currently has <strong>{roleToDelete.user_count}</strong> users. 
-                They must be reassigned to another role before deletion:
+                {formatDescription(roleToDelete.user_count || 0)}
               </AlertDialogDescription>
 
               <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
                 <SelectTrigger id="role-select" className="mt-4">
-                  <SelectValue placeholder="Select a target role" />
+                  <SelectValue placeholder={t('select_target_role')} />
                 </SelectTrigger>
                 <SelectContent>
                   {reassignableRoles.map((role) => (
@@ -91,13 +98,12 @@ export function DeleteRoleAlert({
                 </SelectContent>
               </Select>
             </>
-         
           )}
         </AlertDialogHeader>
 
         <AlertDialogFooter className="mt-2 sm:justify-center">
           <AlertDialogCancel onClick={handleClose} disabled={isLoading}>
-            Cancel
+            {t('cancel')}
           </AlertDialogCancel>
           <AlertDialogAction
             className={buttonVariants({ variant: "destructive2" })}
@@ -108,12 +114,12 @@ export function DeleteRoleAlert({
             {isLoading ? (
               <>
                 <Spinner variant="circle" />
-                Deleting...
+                {t('deleting')}
               </>
             ) : (
               <>
                 <TrashIcon />
-                Delete
+                {t('delete')}
               </>
             )}
           </AlertDialogAction>

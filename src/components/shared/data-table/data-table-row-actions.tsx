@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import { Row } from '@tanstack/react-table'
 import {
   IconEdit,
@@ -31,6 +32,39 @@ interface DataTableRowActionsProps<TData> {
   tooltipMessage?: string
 }
 
+const BUTTON_CLASS =
+  'h-8 w-8 p-0 text-primary hover:border-primary/40 hover:text-primary '
+const TOOLTIP_CLASS = 'bg-primary text-primary-foreground'
+const ARROW_CLASS = 'bg-primary fill-primary'
+
+function ActionButton({
+  label,
+  icon,
+  onClick,
+}: {
+  label?: string
+  icon: ReactNode
+  onClick: () => void
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant='outline'
+          size='sm'
+          onClick={onClick}
+          className={BUTTON_CLASS}
+        >
+          {icon}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent colorClass={TOOLTIP_CLASS} arrowClass={ARROW_CLASS}>
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
 export function DataTableRowActions<TData>({
   row,
   isBlocked,
@@ -38,143 +72,55 @@ export function DataTableRowActions<TData>({
   onBlock,
   onEdit,
   onDelete,
+  onCompare,
   canView = true,
   canEdit = true,
   canDelete = true,
-  onCompare,
   className,
   tooltipMessage,
 }: DataTableRowActionsProps<TData>) {
   const { t } = useTranslation()
-  const buttonClass = 'h-8 w-8 p-0'
+
   return (
     <div className={cn('flex items-center gap-2', className)}>
       {onBlock && canEdit && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => onBlock?.(row.original)}
-              className={cn(
-                buttonClass,
-                isBlocked
-                  ? 'text-green-500 hover:border-green-300 hover:text-green-600'
-                  : 'text-amber-500 hover:border-amber-300 hover:text-amber-600'
-              )}
-            >
-              {isBlocked ? <IconLockOpen size={16} /> : <IconLock size={16} />}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent
-            colorClass={cn(
-              isBlocked ? 'bg-green-500 text-white' : 'bg-amber-500 text-white'
-            )}
-            arrowClass={cn(
-              isBlocked
-                ? 'bg-green-500 fill-green-500'
-                : 'bg-amber-500 fill-amber-500'
-            )}
-          >
-            {tooltipMessage}
-          </TooltipContent>
-        </Tooltip>
+        <ActionButton
+          label={tooltipMessage}
+          icon={isBlocked ? <IconLockOpen size={16} /> : <IconLock size={16} />}
+          onClick={() => onBlock(row.original)}
+        />
       )}
 
       {onView && canView && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => onView?.(row.original)}
-              className={cn(
-                buttonClass,
-                'text-blue-500 hover:border-blue-300 hover:text-blue-600'
-              )}
-            >
-              <IconEye size={16} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent
-            colorClass='bg-blue-500 text-white'
-            arrowClass='bg-blue-500 fill-blue-500'
-          >
-            {t('view')}
-          </TooltipContent>
-        </Tooltip>
+        <ActionButton
+          label={t('view')}
+          icon={<IconEye size={16} />}
+          onClick={() => onView(row.original)}
+        />
       )}
 
       {onEdit && canEdit && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => onEdit?.(row.original)}
-              className={cn(
-                buttonClass,
-                'text-green-500 hover:border-green-300 hover:text-green-600'
-              )}
-            >
-              <IconEdit size={16} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent
-            colorClass='bg-green-500 text-white'
-            arrowClass='bg-green-500 fill-green-500'
-          >
-            {t('edit')}
-          </TooltipContent>
-        </Tooltip>
+        <ActionButton
+          label={t('edit')}
+          icon={<IconEdit size={16} />}
+          onClick={() => onEdit(row.original)}
+        />
       )}
 
       {onCompare && canView && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => onCompare?.(row.original)}
-              className={cn(
-                buttonClass,
-                'text-blue-500 hover:border-blue-300 hover:text-blue-600'
-              )}
-            >
-              <IconHistory size={16} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent
-            colorClass='bg-blue-500 text-white'
-            arrowClass='bg-blue-500 fill-blue-500'
-          >
-            {t('audit')}
-          </TooltipContent>
-        </Tooltip>
+        <ActionButton
+          label={t('audit')}
+          icon={<IconHistory size={16} />}
+          onClick={() => onCompare(row.original)}
+        />
       )}
 
       {onDelete && canDelete && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => onDelete?.(row.original)}
-              className={cn(
-                buttonClass,
-                'text-destructive hover:border-red-300 hover:text-red-600'
-              )}
-            >
-              <IconTrash size={16} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent
-            colorClass='bg-destructive text-white'
-            arrowClass='bg-destructive fill-destructive'
-          >
-            {t('delete')}
-          </TooltipContent>
-        </Tooltip>
+        <ActionButton
+          label={t('delete')}
+          icon={<IconTrash size={16} />}
+          onClick={() => onDelete(row.original)}
+        />
       )}
     </div>
   )

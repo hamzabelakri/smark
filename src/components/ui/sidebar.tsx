@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
-import { PanelLeftIcon } from 'lucide-react'
+import { ChevronLeftIcon, Menu } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { Button } from '@/components/ui/button'
@@ -28,6 +28,8 @@ const SIDEBAR_WIDTH = '16rem'
 const SIDEBAR_WIDTH_MOBILE = '18rem'
 const SIDEBAR_WIDTH_ICON = '3rem'
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
+// CHANGED: total height reserved for the top header (card + spacing)
+const HEADER_HEIGHT = '5rem'
 
 type SidebarContextProps = {
   state: 'expanded' | 'collapsed'
@@ -132,11 +134,13 @@ function SidebarProvider({
             {
               '--sidebar-width': SIDEBAR_WIDTH,
               '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
+              '--header-height': HEADER_HEIGHT, // CHANGED
               ...style,
             } as React.CSSProperties
           }
           className={cn(
-            'group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar',
+            // CHANGED: removed `has-data-[variant=inset]:bg-sidebar`
+            'group/sidebar-wrapper flex min-h-svh w-full',
             className
           )}
           {...props}
@@ -150,7 +154,7 @@ function SidebarProvider({
 
 function Sidebar({
   side = 'left',
-  variant = 'sidebar',
+  variant = 'floating', // CHANGED: default is now floating
   collapsible = 'offcanvas',
   className,
   children,
@@ -184,7 +188,7 @@ function Sidebar({
           data-sidebar='sidebar'
           data-slot='sidebar'
           data-mobile='true'
-          className='w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden'
+          className='w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground/70 [&>button]:hidden'
           style={
             {
               '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
@@ -226,13 +230,16 @@ function Sidebar({
       <div
         data-slot='sidebar-container'
         className={cn(
-          'fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[inset-inline,width] duration-200 ease-linear md:flex',
+          // CHANGED: starts below the header instead of the top of the viewport
+          // (was: `inset-y-0 ... h-svh`)
+          'fixed top-[calc(var(--header-height)+0.5rem)] bottom-0 z-10 hidden w-(--sidebar-width) transition-[inset-inline,width] duration-200 ease-linear md:flex',
           side === 'left'
             ? 'start-0 group-data-[collapsible=offcanvas]:-start-[calc(var(--sidebar-width))]'
             : 'end-0 group-data-[collapsible=offcanvas]:-end-[calc(var(--sidebar-width))]',
           // Adjust the padding for floating and inset variants.
+          // CHANGED: `pt-0` because the header wrapper already provides the top spacing
           variant === 'floating' || variant === 'inset'
-            ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]'
+            ? 'p-2 pt-0 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]'
             : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-e group-data-[side=right]:border-s',
           className
         )}
@@ -241,10 +248,12 @@ function Sidebar({
         <div
           data-sidebar='sidebar'
           data-slot='sidebar-inner'
-          className='flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm'
+          // CHANGED: rounded-xl to match the header card
+          className='flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-xl group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm'
         >
           {children}
         </div>
+        <SidebarFloatingTrigger />
       </div>
     </div>
   )
@@ -270,9 +279,51 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <PanelLeftIcon />
+      <Menu />
       <span className='sr-only'>Toggle Sidebar</span>
     </Button>
+  )
+}
+
+function SidebarFloatingTrigger({
+  className,
+  onClick,
+  ...props
+}: React.ComponentProps<'button'>) {
+  const { toggleSidebar } = useSidebar()
+
+  return (
+    <button
+      data-slot='sidebar-floating-trigger'
+      data-sidebar='floating-trigger'
+      aria-label='Toggle Sidebar'
+      onClick={(event) => {
+        onClick?.(event)
+        toggleSidebar()
+      }}
+      className={cn(
+        'absolute top-4 z-20 hidden h-6 w-6 items-center justify-center rounded-full border border-sidebar-border bg-sidebar text-sidebar-foreground/50 shadow-sm transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground md:flex',
+        // Logical positioning — flips automatically for RTL via `dir`, no rtl: needed here
+        'group-data-[side=left]:-end-1',
+        'group-data-[side=right]:-start-1',
+        'group-data-[collapsible=none]:hidden',
+        className
+      )}
+      {...props}
+    >
+      <ChevronLeftIcon
+        className={cn(
+          'h-3.5 w-3.5 shrink-0 transition-transform duration-300',
+          // Rotation is physical — needs explicit ltr:/rtl: pairing per side + state
+          'group-data-[side=left]:ltr:rotate-0 group-data-[side=left]:rtl:rotate-180',
+          'group-data-[side=left]:group-data-[state=collapsed]:ltr:rotate-180',
+          'group-data-[side=left]:group-data-[state=collapsed]:rtl:rotate-0',
+          'group-data-[side=right]:ltr:rotate-180 group-data-[side=right]:rtl:rotate-0',
+          'group-data-[side=right]:group-data-[state=collapsed]:ltr:rotate-0',
+          'group-data-[side=right]:group-data-[state=collapsed]:rtl:rotate-180'
+        )}
+      />
+    </button>
   )
 }
 
@@ -407,7 +458,7 @@ function SidebarGroupLabel({
       data-slot='sidebar-group-label'
       data-sidebar='group-label'
       className={cn(
-        'flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 ring-sidebar-ring outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
+        'flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/50 ring-sidebar-ring outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
         'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0',
         className
       )}
@@ -458,7 +509,7 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<'ul'>) {
     <ul
       data-slot='sidebar-menu'
       data-sidebar='menu'
-      className={cn('flex w-full min-w-0 flex-col gap-1', className)}
+      className={cn('flex w-full min-w-0 flex-col gap-2', className)}
       {...props}
     />
   )
@@ -724,5 +775,6 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
+  SidebarFloatingTrigger,
   useSidebar,
 }

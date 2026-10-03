@@ -34,7 +34,6 @@ import {
   type NavLink,
   type NavGroup as NavGroupProps,
 } from '@/models/sidebar-model'
-import { checkIsActive } from '@/lib/utils'
 
 export function NavGroup({ title, items }: NavGroupProps) {
   const { state, isMobile } = useSidebar()
@@ -71,7 +70,7 @@ function NavBadge({ children }: { children: ReactNode }) {
 function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
   const { setOpenMobile } = useSidebar()
   const isActive = checkIsActive(href, item)
-  const { t } = useTranslation() // Use hook here
+  const { t } = useTranslation() 
 
   return (
     <SidebarMenuItem>
@@ -82,8 +81,8 @@ function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
       >
         <Link to={item.url} onClick={() => setOpenMobile(false)}>
           {item.icon && (isActive ? (
-            <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-5 items-center justify-center rounded-lg">
-              <item.icon className="size-3" />
+            <div className=" flex aspect-square items-center justify-center rounded-lg">
+              <item.icon className="size-4" />
             </div>
           ) : (
             <item.icon />
@@ -105,7 +104,7 @@ function SidebarMenuCollapsible({
   href: string
 }) {
   const { setOpenMobile } = useSidebar()
-  const { t } = useTranslation() // Use hook here
+  const { t } = useTranslation() 
 
   return (
     <Collapsible
@@ -153,7 +152,7 @@ function SidebarMenuCollapsedDropdown({
   item: NavCollapsible
   href: string
 }) {
-  const { t } = useTranslation() // Use hook here
+  const { t } = useTranslation() 
 
   return (
     <SidebarMenuItem>
@@ -196,3 +195,13 @@ function SidebarMenuCollapsedDropdown({
   )
 }
 
+function checkIsActive(href: string, item: NavItem, mainNav = false) {
+  return (
+    href === item.url ||
+    href.split('?')[0] === item.url ||
+    !!item?.items?.filter((i) => i.url === href).length ||
+    (mainNav &&
+      href.split('/')[1] !== '' &&
+      href.split('/')[1] === item?.url?.split('/')[1])
+  )
+}

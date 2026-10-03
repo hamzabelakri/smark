@@ -1,31 +1,38 @@
-import { Outlet } from '@tanstack/react-router'
-import { SearchProvider } from '@/context/search-provider'
-import { SidebarProvider } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/layout/app-sidebar'
-import { SkipToMain } from '@/components/skip-to-main'
-import { Header } from './header'
+import { Outlet } from "@tanstack/react-router";
+import { getCookie } from "@/lib/cookies";
+import { cn } from "@/lib/utils";
+import { LayoutProvider } from "@/context/layout-provider";
+import { SearchProvider } from "@/context/search-provider";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/layout/app-sidebar";
+import { SkipToMain } from "@/components/skip-to-main";
+import { Header } from "./header";
 
-export function AuthenticatedLayout({ children }: { children?: React.ReactNode }) {
+type AuthenticatedLayoutProps = {
+  children?: React.ReactNode;
+};
+
+export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
+  const defaultOpen = getCookie("sidebar_state") !== "false";
+
   return (
     <SearchProvider>
-      <div className='bg-muted relative z-1 flex min-h-dvh w-full'>
-        {/* Dark band, painted behind header and content */}
-        <div
-          aria-hidden
-          className='absolute inset-x-0 top-0 h-[488px] bg-neutral-900'
-        />
-
-        <div className='relative z-10 flex min-h-svh w-full'>
-          <SidebarProvider defaultOpen={false}>
-            <SkipToMain />
+      <LayoutProvider>
+        <SidebarProvider defaultOpen={defaultOpen} className="flex-col">
+          <Header fixed />
+          <div className="flex min-h-0 flex-1">
             <AppSidebar />
-            <div className='@container/content relative flex w-full flex-1 flex-col bg-transparent has-data-[layout=fixed]:h-svh'>
-              <Header fixed />
+            <SidebarInset
+              className={cn(
+                "@container/content min-w-0",
+                "has-data-[layout=fixed]:h-[calc(100svh-var(--header-height))]"
+              )}
+            >
               {children ?? <Outlet />}
-            </div>
-          </SidebarProvider>
-        </div>
-      </div>
+            </SidebarInset>
+          </div>
+        </SidebarProvider>
+      </LayoutProvider>
     </SearchProvider>
-  )
+  );
 }
