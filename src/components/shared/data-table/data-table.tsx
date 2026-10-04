@@ -87,9 +87,9 @@ export function DataTable<TData extends RowData>({
 
   return (
     <div className='space-y-4'>
+       <DataTableToolbar table={table} toolbarProps={toolbarProps} />
       <div className='rounded-md'>
         <Card paddingY='pb-4'>
-          <DataTableToolbar table={table} toolbarProps={toolbarProps} />
           <Table className='[&_td:first-child>*:first-child]:ms-4 [&_td:last-child>*:first-child]:me-4 [&_th:first-child>*:first-child]:ms-4 [&_th:last-child>*:first-child]:me-4'>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

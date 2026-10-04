@@ -32,8 +32,9 @@ interface DataTableRowActionsProps<TData> {
   tooltipMessage?: string
 }
 
-const BUTTON_CLASS =
-  'h-8 w-8 p-0 text-primary hover:border-primary/40 hover:text-primary '
+// Same look as the header's right-side buttons (LanguageSwitch / ConfigDrawer):
+// size='icon' + variant='ghost' + border, with dimmed icons (opacity-70).
+const BUTTON_CLASS = 'border [&_svg]:opacity-70'
 const TOOLTIP_CLASS = 'bg-primary text-primary-foreground'
 const ARROW_CLASS = 'bg-primary fill-primary'
 
@@ -50,8 +51,8 @@ function ActionButton({
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant='outline'
-          size='sm'
+          size='icon'
+          variant='ghost'
           onClick={onClick}
           className={BUTTON_CLASS}
         >

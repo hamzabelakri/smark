@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { LanguageSwitch } from '@/components/language-switch'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
+import { LanguageSwitch } from '@/components/language-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ThemeSwitch } from '@/components/theme-switch'
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {
   fixed?: boolean
@@ -34,7 +34,7 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
     >
       <div
         className={cn(
-          'bg-sidebar relative flex h-full items-center gap-3 rounded-xl border px-4 shadow-sm transition-shadow sm:gap-4',
+          'bg-sidebar relative flex h-full items-center gap-3 overflow-hidden rounded-xl border px-4 shadow-sm transition-shadow sm:gap-4',
           offset > 10 && fixed && 'shadow-md'
         )}
       >
@@ -43,20 +43,23 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
           className='max-md:scale-125 md:hidden'
         />
 
-        {/* Brand Logo + Name pushed slightly to the right */}
-        <div className='flex items-center gap-2.5 ms-6'>
+        <div
+          className={cn(
+            'bg-primary text-primary-foreground hidden h-full items-center md:flex',
+            'md:-ms-4',
+            'ps-4 pe-8',
+            '[clip-path:polygon(0_0,100%_0,calc(100%_-_28px)_100%,0_100%)]'
+          )}
+        >
           <img
-            src='/images/Smark_logo2.svg'
+            src='/images/logo.svg'
             alt='Smark Logo'
-            className='size-20 rounded-full object-contain'
+            className='h-full max-h-10 w-auto object-contain'
           />
-         
         </div>
 
-        {/* Any extra custom children passed down */}
         {children}
 
-        {/* Right-side actions embedded directly */}
         <div className='ms-auto flex items-center space-x-4'>
           <LanguageSwitch />
           <ThemeSwitch />
